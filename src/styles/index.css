@@ -1,0 +1,363 @@
+:root {
+  --bg: #000000;
+  --green: #00ff00;
+  --green-dim: #00b300;
+  --green-faint: #0a3a0a;
+  --amber: #ffb000;
+  --cyan: #00ffd0;
+  --glow: 0 0 2px rgba(0, 255, 0, 0.9), 0 0 6px rgba(0, 255, 0, 0.55),
+    0 0 14px rgba(0, 255, 0, 0.35);
+  --glow-soft: 0 0 1px rgba(0, 255, 0, 0.8), 0 0 4px rgba(0, 255, 0, 0.4);
+  --font: 'Fira Code', 'Roboto Mono', 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--green);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  text-shadow: var(--glow);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== CRT screen wrapper ===== */
+.screen {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 30, 0, 0.25) 0%,
+      rgba(0, 0, 0, 0.95) 100%
+    ),
+    var(--bg);
+}
+
+/* moving scanlines */
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+}
+
+/* subtle screen flicker + vignette */
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 60%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  animation: flicker 4s infinite;
+}
+
+@keyframes flicker {
+  0%,
+  92%,
+  100% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.92;
+  }
+  95% {
+    opacity: 0.98;
+  }
+  97% {
+    opacity: 0.9;
+  }
+}
+
+/* ===== terminal scroll region ===== */
+.terminal {
+  position: relative;
+  z-index: 4;
+  height: 100%;
+  width: 100%;
+  padding: 24px clamp(16px, 4vw, 64px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.terminal::-webkit-scrollbar {
+  width: 10px;
+}
+.terminal::-webkit-scrollbar-track {
+  background: #020;
+}
+.terminal::-webkit-scrollbar-thumb {
+  background: var(--green-dim);
+  border-radius: 0;
+}
+
+/* ===== window title bar ===== */
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--green-dim);
+  padding: 6px 12px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--green-dim);
+  text-shadow: var(--glow-soft);
+}
+
+.titlebar .dots {
+  display: flex;
+  gap: 6px;
+}
+.titlebar .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid var(--green-dim);
+  box-shadow: var(--glow-soft);
+}
+.titlebar .title {
+  flex: 1;
+  text-align: center;
+}
+.titlebar .meta {
+  opacity: 0.7;
+}
+
+/* ===== boot logs ===== */
+.boot-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--green-dim);
+}
+
+/* ===== command lines / output ===== */
+.line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.prompt-label {
+  color: var(--cyan);
+  text-shadow: 0 0 2px rgba(0, 255, 208, 0.9), 0 0 8px rgba(0, 255, 208, 0.4);
+  user-select: none;
+}
+
+.command-text {
+  color: #eaffea;
+  text-shadow: var(--glow);
+}
+
+.block {
+  margin: 6px 0 20px 0;
+}
+
+.output {
+  margin-top: 4px;
+}
+
+.muted {
+  color: var(--green-dim);
+}
+.bright {
+  color: #ccffcc;
+}
+.amber {
+  color: var(--amber);
+  text-shadow: 0 0 2px rgba(255, 176, 0, 0.9), 0 0 8px rgba(255, 176, 0, 0.4);
+}
+
+/* ===== skills grid (ls output) ===== */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 4px 24px;
+  margin-top: 6px;
+}
+.skill-item::before {
+  content: '› ';
+  color: var(--green-dim);
+}
+
+/* ===== project blocks (find output) ===== */
+.project {
+  margin: 10px 0;
+  padding-left: 2px;
+}
+.project-head {
+  color: var(--green);
+}
+.project-perms {
+  color: var(--green-dim);
+  margin-right: 14px;
+}
+.project-name {
+  color: var(--amber);
+  text-shadow: 0 0 2px rgba(255, 176, 0, 0.9), 0 0 8px rgba(255, 176, 0, 0.4);
+}
+.project-desc {
+  color: #cfffcf;
+  padding-left: 26px;
+}
+.project-stack {
+  color: var(--green-dim);
+  padding-left: 26px;
+}
+
+/* ===== links (ssh output) ===== */
+.link-row {
+  display: block;
+  margin: 2px 0;
+}
+.link-row a {
+  color: var(--cyan);
+  text-decoration: none;
+  text-shadow: 0 0 2px rgba(0, 255, 208, 0.9), 0 0 8px rgba(0, 255, 208, 0.45);
+  border-bottom: 1px dashed transparent;
+}
+.link-row a:hover,
+.link-row a:focus {
+  border-bottom-color: var(--cyan);
+  outline: none;
+}
+.link-key {
+  display: inline-block;
+  min-width: 130px;
+  color: var(--green-dim);
+}
+
+/* ===== interactive input ===== */
+.input-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+}
+.input-line input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #eaffea;
+  font-family: var(--font);
+  font-size: 15px;
+  text-shadow: var(--glow);
+  caret-color: transparent;
+}
+/* custom blinking block cursor for the input */
+.input-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+}
+
+/* blinking cursor block */
+.cursor {
+  display: inline-block;
+  width: 9px;
+  height: 1.05em;
+  margin-left: 2px;
+  background: var(--green);
+  box-shadow: var(--glow);
+  transform: translateY(2px);
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* typewriter caret used during boot typing */
+.type-caret {
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  background: var(--green);
+  box-shadow: var(--glow);
+  margin-left: 1px;
+  transform: translateY(1px);
+  animation: blink 0.8s steps(1) infinite;
+}
+
+.hint {
+  color: var(--green-dim);
+  font-size: 13px;
+  margin: 4px 0 2px;
+}
+
+.error {
+  color: #ff5b5b;
+  text-shadow: 0 0 2px rgba(255, 60, 60, 0.9), 0 0 8px rgba(255, 60, 60, 0.4);
+}
+
+.help-cmd {
+  color: var(--amber);
+  min-width: 90px;
+  display: inline-block;
+}
+
+/* spacing helpers */
+.mt {
+  margin-top: 10px;
+}
+.section-gap {
+  margin-top: 18px;
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 13px;
+  }
+  .link-key {
+    min-width: 96px;
+  }
+  .titlebar .meta {
+    display: none;
+  }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .screen::after,
+  .cursor,
+  .type-caret {
+    animation: none;
+  }
+}
